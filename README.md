@@ -1,6 +1,6 @@
-# parent_child_comm
+# 企业管理系统前端界面设计
 
-> A Vue.js project
+> 北软2015届, 软件专业毕业设计, 耿文浩
 
 ## Build Setup
 
@@ -18,4 +18,3 @@ npm run build
 npm run build --report
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
