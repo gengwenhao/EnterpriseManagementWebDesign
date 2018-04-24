@@ -87,27 +87,33 @@
 
   export default {
     name: 'navbar',
+    computed: {
+      isLogin() {
+        return this.$store.state.isLogin
+      }
+    },
     data() {
       return {
         activeIndex: '1',
-        isLogin: false,
         userName: '',
         userPwd: ''
       }
     },
     components: {},
     methods: {
-      // 退出登陆
-      logout() {
-        this.postLogoutData()
+      // notify
+      notify(title, messageText) {
+        const h = this.$createElement;
+        this.$notify({
+          title: title,
+          message: h('i', {style: 'color: teal'}, messageText)
+        })
       },
 
-      // 发送退出登陆的数据到服务器后端
-      postLogoutData() {
-        let logoutUrl = 'http://localhost:8000/api/logout/'
-        this.$http.get(logoutUrl).then((res) => {
-          this.isLogin = (res.data.status !== 1)
-        })
+      // 退出登陆
+      logout() {
+        cookie.delCookie('token')
+        this.$store.commit('logout')
       },
 
       // 显示注销模态模态框
@@ -123,44 +129,30 @@
 
       // 登陆
       login() {
-        if (this.userName !== '' && this.userPwd !== '') {
+        if (this.userName !== '' && this.userPwd !== '')
           this.postLoginData()
-        } else {
+        else
           this.$message('请输入用户名或密码')
-        }
         this.clearInput()
       },
 
       // 发送验证登陆的数据到服务器后端
       postLoginData() {
-        let loginUrl = 'http://127.0.0.1:8000/login/'
         this.$http({
           method: 'post',
-          url: loginUrl,
+          url: 'http://127.0.0.1:8000/login/',
           data: {
             username: this.userName,
             password: this.userPwd
           }
         }).then(res => {
           cookie.setCookie('token', res.data.token, 7)
-          cookie.setCookie('username', res.data.username, 7)
-          // 更新store数据
-          //this.$store.dispatch('setInfo')
-          // 跳转到首页
-          // this.$router.push({name: 'index'})
-          this.isLogin = true
-          const h = this.$createElement;
-          this.$notify({
-            title: '成功',
-            message: h('i', {style: 'color: teal'}, '登陆完成')
-          })
+          this.$store.commit('login')
+          this.notify('认证信息通过', '欢迎登陆')
+
         }, err => {
           console.log(err)
-          const h = this.$createElement;
-          this.$notify({
-            title: '无法使用提供的认证信息登录',
-            message: h('i', {style: 'color: teal'}, '检查您的输入信息或网络状态')
-          })
+          this.notify('无法使用提供的认证信息登录', '检查您的输入信息或网络状态')
         })
       },
 

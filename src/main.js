@@ -4,6 +4,7 @@ import ElementUI from 'element-ui'
 import router from './router'
 import VCharts from 'v-charts'
 import axios from 'axios'
+import store from './store'
 
 import 'element-ui/lib/theme-chalk/index.css'
 import '../node_modules/semantic-ui-css/semantic.min.css'
@@ -16,6 +17,7 @@ Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
+  store,
   el: '#app',
   router,
   components: {App},

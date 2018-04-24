@@ -4,7 +4,7 @@
       <el-row>
         <el-col :span="24">
           <h5 id="title">
-            <router-link :to="{path: '/'}"><i class="fa fa-home"></i>主页</router-link>
+            <router-link :to="{path: '/'}"><i class="fa fa-home"></i>主页{{ $store.state.isLogin }}</router-link>
           </h5>
         </el-col>
       </el-row>
