@@ -62,25 +62,36 @@
         </el-col>
         <el-col :span="8">
           <div class="content-box">
-            <h3 class="title"><i class="fa fa-user-plus"></i>用户留言</h3>
-            <div class="content-body">
-              <div class="ui segment">
-                <div class="ui comments">
-                  <h3 class="ui dividing header">最近的用户</h3>
-                  <div class="comment">
-                    <div class="content" v-for="msg in user_message">
-                      <a class="author">{{ msg.name }}: </a>
-                      <div class="metadata">
-                        <span class="date">{{ msg.time }}</span>
-                      </div>
-                      <div class="text">
-                        <small>{{ msg.content }}</small>
-                      </div>
+            <h3 class="title"><i class="fa fa-user-plus"></i>我的留言</h3>
+            <div class="content" v-for="(msg, index) in user_message.results">
+              <el-col :span="12">
+                <div class="ui card">
+                  <div class="content">
+                    <div class="header">{{ msg.name }}</div>
+                  </div>
+                  <div class="content">
+                    <h4 class="ui sub header">{{ msg.time.date }}</h4>
+                    <div class="ui small feed">
+                      {{ msg.content | slinceMsg }}
                     </div>
                   </div>
+                  <div class="extra content">
+                    <button @click="openMsgDetailPanel(index)" class="ui button">查看详细</button>
+                  </div>
                 </div>
-              </div>
+              </el-col>
             </div>
+            <el-col :span="24">
+              <el-pagination
+                id="pagination"
+                @current-change="pageChange"
+                small
+                background layout="prev, pager, next"
+                :page-size="4"
+                :total="msg_count"
+              >
+              </el-pagination>
+            </el-col>
           </div>
         </el-col>
       </el-row>
@@ -97,15 +108,48 @@
     name: 'index',
     data() {
       return {
+        msg_count: 0,
         all_users_count: 0,
         new_user_count_today: 0,
         all_orgs_count: 0,
         all_orgs_count_month: 0,
-        user_message: [],
+        user_message: {},
         recent_users: []
       }
     },
+    filters: {
+      slinceMsg(str) {
+        return (str && str.length > 8) ?
+          str.substring(0, 8) + '...' :
+          str.substring(0, 8)
+      }
+    },
     methods: {
+      // 留言详细内容面板
+      openMsgDetailPanel(index) {
+        if (index > this.user_message.results.length) return
+        this.$alert(this.user_message.results[index].content,
+          this.user_message.results[index].name)
+      },
+      // 分页
+      pageChange(page) {
+        this.$http.get('http://127.0.0.1:8000/message_profile/', {params: {page: page}})
+          .then(res => {
+            this.user_message = res.data
+          }, err => {
+            console.log('获取用户留言失败', err)
+          })
+      },
+      // 删除留言
+      delMsg() {
+        const token = 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNTI0NzE5MzM4LCJlbWFpbCI6Imdlbmd3ZW5oYW85N0AxMjYuY29tIn0.khpvidHQmolWbBnhi0Wtav_Nzn5keVZRxVJJTmdDhmI'
+        this.$http.delete('http://127.0.0.1:8000/message_profile/21', {headers: {'Authorization': token}})
+          .then(res => {
+            console.log(res)
+          }, err => {
+            console.log('错误', err)
+          })
+      },
       // 删除用户
       removeUser(index) {
         delete this.recent_users.splice(index, 1)
@@ -120,7 +164,6 @@
         this.new_user_count_today = res.data.new_user_count_today
         this.all_orgs_count = res.data.all_orgs_count
         this.all_orgs_count_month = res.data.all_orgs_count_month
-        this.user_message = res.data.user_message
         this.recent_users = res.data.recent_users
         this.chartSettings = {
           dimension: '组织',
@@ -136,6 +179,13 @@
         })
         .catch(err => {
           console.log(err)
+        })
+      this.$http.get('http://127.0.0.1:8000/message_profile/')
+        .then(res => {
+          this.user_message = res.data
+          this.msg_count = res.data.count
+        }, err => {
+          console.log('获取用户留言失败', err)
         })
     }
   }
