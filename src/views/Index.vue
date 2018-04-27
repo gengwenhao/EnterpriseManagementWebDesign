@@ -81,9 +81,6 @@
                 </div>
               </el-col>
             </div>
-            <div v-if="user_message.results" class="ui segment">
-              暂无留言...
-            </div>
             <el-col id="id-msg-pagination" :span="18">
               <el-pagination
                 id="pagination"
@@ -139,12 +136,17 @@
           cancelButtonText: '取消',
         }).then(({value}) => {
           if (value) {
-            this.$message({
-              type: 'success',
-              message: '添加留言成功: ' + value
+            this.$http.post('http://localhost:8000/message_profile/', {
+              "content": value,
+              "user": 1
+            }).then(res => {
+              this.$message({
+                type: 'success',
+                message: '添加留言成功: ' + value
+              }, err => {
+                this.$message('请输入留言内容')
+              })
             })
-
-
           } else {
             this.$message('请输入留言内容')
           }
