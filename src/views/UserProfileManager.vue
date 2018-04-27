@@ -77,6 +77,11 @@
       };
     },
     methods: {
+      created() {
+        // 验证登陆
+        let token = cookie.getCookie('token')
+        if (token) this.$store.commit('login')
+      },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {

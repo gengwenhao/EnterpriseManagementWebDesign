@@ -43,8 +43,8 @@
           <div class="content-box">
             <h3 class="title"><i class="fa fa-paper-plane-o"></i>最近用户</h3>
             <div v-if="recent_users.length != 0" class="ui segment">
-              <div v-for="(user, index) in recent_users" class="ui image label">
-                {{ user.username }} <i :index="index" @click="removeUser(index)" class="delete icon"></i>
+              <div v-for="user in recent_users" class="ui image label">
+                {{ user.username }}
               </div>
             </div>
             <div v-else="recent_users.length != 0" class="ui segment">
@@ -81,7 +81,10 @@
                 </div>
               </el-col>
             </div>
-            <el-col :span="24">
+            <div v-if="user_message.results" class="ui segment">
+              暂无留言...
+            </div>
+            <el-col id="id-msg-pagination" :span="18">
               <el-pagination
                 id="pagination"
                 @current-change="pageChange"
@@ -91,6 +94,9 @@
                 :total="msg_count"
               >
               </el-pagination>
+            </el-col>
+            <el-col :span="6">
+              <button @click="showAddMsgModal" id="id-add-msg-btn" class="ui button small inverted blue">添加留言</button>
             </el-col>
           </div>
         </el-col>
@@ -102,6 +108,7 @@
 <script>
   import ElRow from "element-ui/packages/row/src/row";
   import Modal from '../components/Modal'
+  import cookie from '../../static/js/cookie'
 
   export default {
     components: {ElRow, Modal},
@@ -125,7 +132,25 @@
       }
     },
     methods: {
-      // 留言详细内容面板
+      // 弹出添加留言模态框
+      showAddMsgModal() {
+        this.$prompt('请输入留言内容', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(({value}) => {
+          if (value) {
+            this.$message({
+              type: 'success',
+              message: '添加留言成功: ' + value
+            })
+
+
+          } else {
+            this.$message('请输入留言内容')
+          }
+        })
+      },
+      // 留言详情面板
       openMsgDetailPanel(index) {
         if (index > this.user_message.results.length) return
         this.$alert(this.user_message.results[index].content,
@@ -139,20 +164,6 @@
           }, err => {
             console.log('获取用户留言失败', err)
           })
-      },
-      // 删除留言
-      delMsg() {
-        const token = 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNTI0NzE5MzM4LCJlbWFpbCI6Imdlbmd3ZW5oYW85N0AxMjYuY29tIn0.khpvidHQmolWbBnhi0Wtav_Nzn5keVZRxVJJTmdDhmI'
-        this.$http.delete('http://127.0.0.1:8000/message_profile/21', {headers: {'Authorization': token}})
-          .then(res => {
-            console.log(res)
-          }, err => {
-            console.log('错误', err)
-          })
-      },
-      // 删除用户
-      removeUser(index) {
-        delete this.recent_users.splice(index, 1)
       },
       // 设置图表
       setChart(res) {
@@ -170,28 +181,48 @@
           metrics: '人数'
         }
       },
+      // 获取用户留言
+      getMsg() {
+        this.$http.get('http://127.0.0.1:8000/message_profile/')
+          .then(res => {
+            this.user_message = res.data
+            this.msg_count = res.data.count
+          }, err => {
+            console.log('获取用户留言失败', err)
+          })
+      },
+      // 获取用户信息
+      getUserInfo() {
+        this.$http.get('http://127.0.0.1:8000/api/userinfo/')
+          .then(res => {
+            this.setChart(res)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }
     },
     created() {
+      // 验证登陆
+      let token = cookie.getCookie('token')
+      if (token) this.$store.commit('login')
+
       // 网络请求数据
-      this.$http.get('http://127.0.0.1:8000/api/userinfo/')
-        .then(res => {
-          this.setChart(res)
-        })
-        .catch(err => {
-          console.log(err)
-        })
-      this.$http.get('http://127.0.0.1:8000/message_profile/')
-        .then(res => {
-          this.user_message = res.data
-          this.msg_count = res.data.count
-        }, err => {
-          console.log('获取用户留言失败', err)
-        })
+      this.getUserInfo()
+      this.getMsg()
     }
   }
 </script>
 
 <style scoped>
+  #id-msg-pagination {
+    margin-top: 20px;
+  }
+
+  #id-add-msg-btn {
+    margin-top: 12px;
+  }
+
   #title {
     text-align: left;
     text-indent: 14px;

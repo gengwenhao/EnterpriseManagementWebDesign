@@ -67,7 +67,7 @@
             }
 
             this.tableData = res.data.results
-            this.tableData.forEach((item)=>{
+            this.tableData.forEach((item) => {
               item.date_joined = item.date_joined.split('.')[0].replace('T', ' ')
               item.last_login = item.last_login.split('.')[0].replace('T', ' ')
             })
@@ -75,6 +75,10 @@
       }
     },
     created() {
+      // 验证登陆
+      let token = cookie.getCookie('token')
+      if (token) this.$store.commit('login')
+
       axios.get('http://localhost:8000/org_profile/')
         .then(res => {
           this.treeData = res.data.results

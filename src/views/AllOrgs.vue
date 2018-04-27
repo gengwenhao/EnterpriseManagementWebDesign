@@ -84,6 +84,10 @@
       }
     },
     created() {
+      // 验证登陆
+      let token = cookie.getCookie('token')
+      if (token) this.$store.commit('login')
+
       axios.get('http://127.0.0.1:8000/api/orginfo/')
         .then(res => {
           this.tableData = res.data.orgs

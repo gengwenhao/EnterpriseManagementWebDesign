@@ -24,7 +24,7 @@
     <div id="login-modal">
       <div id="login" class="ui base modal">
         <i class="close icon"></i>
-        <div class="header" v-text="modalTitle"></div>
+        <div class="header">登陆</div>
         <div class="content">
           <div class="ui form">
             <h4 class="ui dividing header">请详细核对您的信息</h4>
