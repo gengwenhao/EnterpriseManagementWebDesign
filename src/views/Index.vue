@@ -93,7 +93,9 @@
               </el-pagination>
             </el-col>
             <el-col :span="6">
-              <button @click="showAddMsgModal" id="id-add-msg-btn" class="ui button small inverted blue">添加留言</button>
+              <button v-if="isLogin" @click="showAddMsgModal" id="id-add-msg-btn" class="ui button small inverted blue">
+                添加留言
+              </button>
             </el-col>
           </div>
         </el-col>
@@ -121,6 +123,11 @@
         recent_users: []
       }
     },
+    computed: {
+      isLogin() {
+        return this.$store.state.isLogin
+      }
+    },
     filters: {
       slinceMsg(str) {
         return (str && str.length > 8) ?
@@ -137,15 +144,23 @@
         }).then(({value}) => {
           if (value) {
             this.$http.post('http://localhost:8000/message_profile/', {
-              "content": value,
-              "user": 1
-            }).then(res => {
+              "content": value
+            }, {
+              headers: {
+                'Authorization': 'JWT ' + cookie.getCookie('token'),
+              }
+            },).then(res => {
+              // show message box
               this.$message({
                 type: 'success',
                 message: '添加留言成功: ' + value
-              }, err => {
-                this.$message('请输入留言内容')
               })
+
+              // refresh
+              this.getMsg()
+
+            }, err => {
+              this.$message('请输入留言内容')
             })
           } else {
             this.$message('请输入留言内容')
@@ -185,7 +200,11 @@
       },
       // 获取用户留言
       getMsg() {
-        this.$http.get('http://127.0.0.1:8000/message_profile/')
+        this.$http.get('http://127.0.0.1:8000/message_profile/', {
+          headers: {
+            'Authorization': 'JWT ' + cookie.getCookie('token'),
+          }
+        })
           .then(res => {
             this.user_message = res.data
             this.msg_count = res.data.count
