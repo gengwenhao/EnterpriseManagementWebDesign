@@ -5,6 +5,7 @@ import UserProfileManager from '../views/UserProfileManager'
 import Tree from '../views/Tree'
 import AllOrgs from '../views/AllOrgs'
 import AllUsers from '../views/AllUsers'
+import Tools from '../views/Tools'
 
 Vue.use(Router)
 
@@ -36,6 +37,11 @@ export default new Router({
       path: '/all-users',
       name: 'all-users',
       component: AllUsers
+    },
+    {
+      path: '/tools',
+      name: 'tools',
+      component: Tools
     }
   ]
 })

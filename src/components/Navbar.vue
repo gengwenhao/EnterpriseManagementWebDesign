@@ -10,6 +10,7 @@
           <el-menu-item index="2-3">管理人员</el-menu-item>
         </el-submenu>
         <el-menu-item v-if="isLogin" index="3"><a>个人信息管理</a></el-menu-item>
+        <el-menu-item v-if="isLogin" index="4"><a>工具中心</a></el-menu-item>
         <div id="logout" v-if="isLogin">
           <div @click="showLogoutModal" class="ui button inverted blue small">注销登陆</div>
         </div>
@@ -94,7 +95,7 @@
     },
     data() {
       return {
-        activeIndex: '1',
+        activeIndex: 1,
         userName: '',
         userPwd: ''
       }
@@ -178,6 +179,9 @@
             break
           case '3':
             this.$router.push({name: 'userprofile-manager'})
+            break
+          case '4':
+            this.$router.push({name: 'tools'})
             break
         }
       }

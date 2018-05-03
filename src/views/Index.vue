@@ -4,7 +4,7 @@
       <el-row>
         <el-col :span="24">
           <h5 id="title">
-            <router-link :to="{path: '/'}"><i class="fa fa-home"></i>主页{{ $store.state.isLogin }}</router-link>
+            <router-link :to="{path: '/'}"><i class="fa fa-home"></i>主页</router-link>
           </h5>
         </el-col>
       </el-row>
@@ -41,7 +41,7 @@
       <el-row class="message-box">
         <el-col :span="8">
           <div class="content-box">
-            <h3 class="title"><i class="fa fa-paper-plane-o"></i>最近用户</h3>
+            <h3 class="title"><i class="fa fa-paper-plane-o"></i>最近活跃用户</h3>
             <div v-if="recent_users.length != 0" class="ui segment">
               <div v-for="user in recent_users" class="ui image label">
                 {{ user.username }}
@@ -76,7 +76,11 @@
                     </div>
                   </div>
                   <div class="extra content">
-                    <button @click="openMsgDetailPanel(index)" class="ui button">查看详细</button>
+                    <button @click="openMsgDetailPanel(index)" class="ui animated inverted blue small button">
+                      <div class="visible content">查看详情</div>
+                      <div class="hidden content">
+                        <i class="right arrow icon"></i>
+                      </div></button>
                   </div>
                 </div>
               </el-col>
@@ -93,8 +97,11 @@
               </el-pagination>
             </el-col>
             <el-col :span="6">
-              <button v-if="isLogin" @click="showAddMsgModal" id="id-add-msg-btn" class="ui button small inverted blue">
-                添加留言
+              <button v-if="isLogin" @click="showAddMsgModal" id="id-add-msg-btn" class="ui animated fade button small inverted blue">
+                <div class="visible content">添加留言</div>
+                <div class="hidden content">
+                  Add
+                </div>
               </button>
             </el-col>
           </div>
@@ -175,7 +182,12 @@
       },
       // 分页
       pageChange(page) {
-        this.$http.get('http://127.0.0.1:8000/message_profile/', {params: {page: page}})
+        this.$http.get('http://127.0.0.1:8000/message_profile/', {
+          params: {page: page},
+          headers: {
+            'Authorization': 'JWT ' + cookie.getCookie('token'),
+          }
+        })
           .then(res => {
             this.user_message = res.data
           }, err => {
