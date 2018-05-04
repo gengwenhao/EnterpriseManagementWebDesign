@@ -105,7 +105,7 @@
     methods: {
       // init Messaage Board
       initMsgBoard() {
-        this.$http.get('http://e.gengwenhao.com:8000/board/', {
+        this.$http.get('http://em.gengwenhao.com:8000/board/', {
           headers: {
             'Authorization': 'JWT ' + cookie.getCookie('token'),
           }
@@ -147,7 +147,7 @@
       postLoginData() {
         this.$http({
           method: 'post',
-          url: 'http://e.gengwenhao.com:8000/login/',
+          url: 'http://em.gengwenhao.com:8000/login/',
           data: {
             username: this.userName,
             password: this.userPwd
@@ -191,7 +191,7 @@
       },
       // 获取全站通知
       getBoardMessage() {
-        this.$http.get('http://e.gengwenhao.com:8000/board/', {
+        this.$http.get('http://em.gengwenhao.com:8000/board/', {
           headers: {
             'Authorization': 'JWT ' + cookie.getCookie('token'),
           }

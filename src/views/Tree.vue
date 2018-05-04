@@ -52,7 +52,7 @@
     },
     methods: {
       pageToAll() {
-        this.$http.get('http://e.gengwenhao.com:8000/org_profile/')
+        this.$http.get('http://em.gengwenhao.com:8000/org_profile/')
           .then(res => {
             this.treeData = res.data.results
           })
@@ -93,7 +93,7 @@
       let token = cookie.getCookie('token')
       if (token) this.$store.commit('login')
 
-      this.$http.get('http://e.gengwenhao.com:8000/org_profile/')
+      this.$http.get('http://em.gengwenhao.com:8000/org_profile/')
         .then(res => {
           this.treeData = res.data.results
         })

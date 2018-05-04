@@ -97,7 +97,7 @@
       },
       // 网络发送
       postBoardContent(type, targetId) {
-        this.$http.post('http://e.gengwenhao.com:8000/board/', {
+        this.$http.post('http://em.gengwenhao.com:8000/board/', {
           "content": this.editorContent,
           "type": type,
           "target_id": targetId

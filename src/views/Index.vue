@@ -152,7 +152,7 @@
           cancelButtonText: '取消',
         }).then(({value}) => {
           if (value) {
-            this.$http.post('http://e.gengwenhao.com:8000/message_profile/', {
+            this.$http.post('http://em.gengwenhao.com:8000/message_profile/', {
               "content": value
             }, {
               headers: {
@@ -184,7 +184,7 @@
       },
       // 分页
       pageChange(page) {
-        this.$http.get('http://e.gengwenhao.com:8000/message_profile/', {
+        this.$http.get('http://em.gengwenhao.com:8000/message_profile/', {
           params: {page: page},
           headers: {
             'Authorization': 'JWT ' + cookie.getCookie('token'),
@@ -214,7 +214,7 @@
       },
       // 获取用户留言
       getMsg() {
-        this.$http.get('http://e.gengwenhao.com:8000/message_profile/', {
+        this.$http.get('http://em.gengwenhao.com:8000/message_profile/', {
           headers: {
             'Authorization': 'JWT ' + cookie.getCookie('token'),
           }
@@ -228,7 +228,7 @@
       },
       // 获取用户信息
       getUserInfo() {
-        this.$http.get('http://e.gengwenhao.com:8000/api/userinfo/')
+        this.$http.get('http://em.gengwenhao.com:8000/api/userinfo/')
           .then(res => {
             this.setChart(res)
           })

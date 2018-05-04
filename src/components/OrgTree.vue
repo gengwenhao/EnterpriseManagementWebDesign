@@ -19,7 +19,7 @@
       }
     },
     created() {
-      axios.get('http://e.gengwenhao.com:8000/org_profile/')
+      axios.get('http://em.gengwenhao.com:8000/org_profile/')
         .then(res => {
           this.org_list = res.data.results
         })
