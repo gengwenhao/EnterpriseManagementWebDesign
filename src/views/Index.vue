@@ -67,10 +67,10 @@
               <el-col :span="12">
                 <div class="ui card">
                   <div class="content">
-                    <div class="header">{{ msg.name }}</div>
+                    <div class="header">{{ msg.time.date }}</div>
                   </div>
                   <div class="content">
-                    <h4 class="ui sub header">{{ msg.time.date }}</h4>
+                    <h4 class="ui sub header">{{ msg.time.time }}</h4>
                     <div class="ui small feed">
                       {{ msg.content | slinceMsg }}
                     </div>
@@ -80,7 +80,8 @@
                       <div class="visible content">查看详情</div>
                       <div class="hidden content">
                         <i class="right arrow icon"></i>
-                      </div></button>
+                      </div>
+                    </button>
                   </div>
                 </div>
               </el-col>
@@ -97,7 +98,8 @@
               </el-pagination>
             </el-col>
             <el-col :span="6">
-              <button v-if="isLogin" @click="showAddMsgModal" id="id-add-msg-btn" class="ui animated fade button small inverted blue">
+              <button v-if="isLogin" @click="showAddMsgModal" id="id-add-msg-btn"
+                      class="ui animated fade button small inverted blue">
                 <div class="visible content">添加留言</div>
                 <div class="hidden content">
                   Add
@@ -150,7 +152,7 @@
           cancelButtonText: '取消',
         }).then(({value}) => {
           if (value) {
-            this.$http.post('http://localhost:8000/message_profile/', {
+            this.$http.post('http://e.gengwenhao.com:8000/message_profile/', {
               "content": value
             }, {
               headers: {
@@ -182,7 +184,7 @@
       },
       // 分页
       pageChange(page) {
-        this.$http.get('http://127.0.0.1:8000/message_profile/', {
+        this.$http.get('http://e.gengwenhao.com:8000/message_profile/', {
           params: {page: page},
           headers: {
             'Authorization': 'JWT ' + cookie.getCookie('token'),
@@ -212,7 +214,7 @@
       },
       // 获取用户留言
       getMsg() {
-        this.$http.get('http://127.0.0.1:8000/message_profile/', {
+        this.$http.get('http://e.gengwenhao.com:8000/message_profile/', {
           headers: {
             'Authorization': 'JWT ' + cookie.getCookie('token'),
           }
@@ -226,7 +228,7 @@
       },
       // 获取用户信息
       getUserInfo() {
-        this.$http.get('http://127.0.0.1:8000/api/userinfo/')
+        this.$http.get('http://e.gengwenhao.com:8000/api/userinfo/')
           .then(res => {
             this.setChart(res)
           })

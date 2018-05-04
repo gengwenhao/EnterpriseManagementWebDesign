@@ -82,7 +82,7 @@
           if (valid) {
             axios({
               method: 'post',
-              url: 'http://localhost:8000/api/update-userpassword/',
+              url: 'http://e.gengwenhao.com:8000/api/update-userpassword/',
               data: {
                 password: this.ruleForm2.pass,
               }

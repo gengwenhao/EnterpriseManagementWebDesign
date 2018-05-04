@@ -19,7 +19,7 @@
       }
     },
     created() {
-      axios.get('http://127.0.0.1:8000/org_profile/')
+      axios.get('http://e.gengwenhao.com:8000/org_profile/')
         .then(res => {
           this.org_list = res.data.results
         })

@@ -79,7 +79,7 @@
       let token = cookie.getCookie('token')
       if (token) this.$store.commit('login')
 
-      axios.get('http://localhost:8000/org_profile/')
+      axios.get('http://e.gengwenhao.com:8000/org_profile/')
         .then(res => {
           this.treeData = res.data.results
         })

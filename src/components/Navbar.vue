@@ -97,11 +97,22 @@
       return {
         activeIndex: 1,
         userName: '',
-        userPwd: ''
+        userPwd: '',
+        boardMessageCount: 0
       }
     },
     components: {},
     methods: {
+      // init Messaage Board
+      initMsgBoard() {
+        this.$http.get('http://e.gengwenhao.com:8000/board/', {
+          headers: {
+            'Authorization': 'JWT ' + cookie.getCookie('token'),
+          }
+        }).then(res => {
+          this.boardMessageCount = res.data.count
+        })
+      },
       // notify
       notify(title, messageText) {
         const h = this.$createElement;
@@ -110,24 +121,20 @@
           message: h('i', {style: 'color: teal'}, messageText)
         })
       },
-
       // 退出登陆
       logout() {
         cookie.delCookie('token')
         this.$store.commit('logout')
       },
-
       // 显示注销模态模态框
       showLogoutModal() {
         $('#id-logout').modal('show')
       },
-
       // 清空用户输入状态
       clearInput() {
         this.userName = ''
         this.userPwd = ''
       },
-
       // 登陆
       login() {
         if (this.userName !== '' && this.userPwd !== '')
@@ -136,12 +143,11 @@
           this.$message('请输入用户名或密码')
         this.clearInput()
       },
-
       // 发送验证登陆的数据到服务器后端
       postLoginData() {
         this.$http({
           method: 'post',
-          url: 'http://127.0.0.1:8000/login/',
+          url: 'http://e.gengwenhao.com:8000/login/',
           data: {
             username: this.userName,
             password: this.userPwd
@@ -156,12 +162,10 @@
           this.notify('无法使用提供的认证信息登录', '检查您的输入信息或网络状态')
         })
       },
-
       // 显示登陆模态框
       showLoginModal() {
         $('#login').modal('show')
       },
-
       // 点击导航类的菜单节点
       handleSelect(key, keyPath) {
         switch (key) {
@@ -184,7 +188,47 @@
             this.$router.push({name: 'tools'})
             break
         }
+      },
+      // 获取全站通知
+      getBoardMessage() {
+        this.$http.get('http://e.gengwenhao.com:8000/board/', {
+          headers: {
+            'Authorization': 'JWT ' + cookie.getCookie('token'),
+          }
+        }).then(res => {
+          if (res.data.count > this.boardMessageCount) {
+            this.boardMessageCount = res.data.count
+
+            let title = ''
+            switch (res.data.results[0].type) {
+              case 0:
+                title = '收到全站公告'
+                break
+              case 1:
+                title = '收到会议邀请'
+                break
+              case 2:
+                title = '收到个人消息'
+                break
+            }
+
+            this.$notify({
+              title: title,
+              message: res.data.results[0].content,
+              type: 'success',
+              dangerouslyUseHTMLString: true
+            })
+          }
+        })
       }
+    },
+    // 定时刷新
+    beforeMount() {
+      //设置定时器，每3秒刷新一次
+      setInterval(this.getBoardMessage, 1000)
+    },
+    created() {
+      this.initMsgBoard()
     }
   }
 </script>
