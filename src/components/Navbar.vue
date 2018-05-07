@@ -183,9 +183,6 @@
       // 获取全站通知
       getBoardMessage() {
         api.getBoardMessage().then(res => {
-          // vuex
-          this.$store.state.msgBoard = res.data
-
           if (res.data.count > this.boardMessageCount) {
             this.boardMessageCount = res.data.count
 

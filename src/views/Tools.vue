@@ -3,6 +3,7 @@
     <div class="ui message">
       <div class="header">该页面下您将享有功能</div>
       <ul class="list">
+        <li>您可以在历史记录中查看所有类型的通知</li>
         <li>您现在可以对全站范围内用户发起公告</li>
         <li>您可以给机构下所有用户发起通知</li>
         <li>您可以给指定用户发起消息</li>
@@ -13,6 +14,19 @@
     </div>
     <div class="ui segment">
       <div class="ui cards">
+        <div class="card">
+          <div class="content">
+            <div class="header">历史记录</div>
+            <div class="meta">这个面板存放了您的所有历史通知</div>
+            <div class="description">查看历史记录</div>
+          </div>
+          <div class="extra content">
+            <div @click="showMsgBoard" class="ui button inverted fluid blue">
+              查看
+            </div>
+            <div class="floating ui teal label">{{ msgCount }}</div>
+          </div>
+        </div>
         <div class="card">
           <div class="content">
             <div class="header">公告</div>
@@ -49,19 +63,7 @@
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="content">
-            <div class="header">历史记录</div>
-            <div class="meta">这个面板存放了您的所有历史通知</div>
-            <div class="description">查看历史记录</div>
-          </div>
-          <div class="extra content">
-            <div class="ui button inverted fluid blue">
-              查看
-            </div>
-            <div class="floating ui teal label">{{ msgBoard.count }}</div>
-          </div>
-        </div>
+
       </div>
     </div>
 
@@ -94,6 +96,30 @@
       <button @click="sendBoard" id="id-submit-editor" class="ui button grey" v-text="submitContent"></button>
     </div>
 
+
+    <div id="msg" v-show="isShowMsg">
+
+      <div class="ui items" v-for="msg in msgList">
+        <div class="ui yellow message">
+          <i class="star icon"></i>
+          <span>{{ msg.add_time|strfTime }}</span>
+          <div v-html="msg.content"></div>
+        </div>
+      </div>
+
+      <el-col id="id-msg-pagination">
+        <el-pagination
+          id="pagination"
+          @current-change="pageChange"
+          small
+          layout="prev, pager, next"
+          :page-size="4"
+          :total="msgCount"
+        >
+        </el-pagination>
+      </el-col>
+    </div>
+
   </div>
 </template>
 
@@ -105,9 +131,9 @@
 
   export default {
     name: 'tools',
-    computed: {
-      msgBoard() {
-        return this.$store.state.msgBoard
+    filters: {
+      strfTime: function (value) {
+        return value.split('.')[0].replace('T', ' ')
       }
     },
     watch: {
@@ -118,6 +144,7 @@
     components: {ElCollapseTransition},
     data() {
       return {
+        isShowMsg: false,
         userId: '',
         editorContent: '',
         isShowEditor: false,
@@ -131,7 +158,9 @@
           children: 'children',
           label: 'name'
         },
-        curBoardType: 0
+        curBoardType: 0,
+        msgCount: 0,
+        msgList: []
       }
     },
     methods: {
@@ -147,6 +176,7 @@
         this.isShowEditor = false
         this.isShowOrgTree = false
         this.isShowUserIdInput = false
+        this.isShowMsg = false
       },
       // 显示公告发起面板
       showBoard() {
@@ -173,6 +203,7 @@
       },
       // 发送
       sendBoard() {
+
         if (this.editorContent)
           switch (this.curBoardType) {
             case 1:
@@ -205,11 +236,35 @@
           }, err => {
             this.$message('发送失败')
           })
+
+        this.updateMsgBoard(1)
+      },
+      // 显示MsgBoard
+      showMsgBoard() {
+        this.updateMsgBoard(1)
+        this.closeBoard()
+        this.isShowMsg = true
+      },
+      // 更新历史记录
+      updateMsgBoard(page) {
+        api.getBoardMessage(page).then(res => {
+          this.msgCount = res.data.count
+          this.msgList = res.data.results
+        })
+      },
+      // 分页器
+      pageChange(page) {
+        this.updateMsgBoard(page)
       }
     },
     created() {
       let token = cookie.getCookie('token')
       if (token) this.$store.commit('login')
+
+      api.getBoardMessage().then(res => {
+        this.msgCount = res.data.count
+        this.msgList = res.data.results
+      })
 
       api.getOrgProfile().then(res => {
         this.orgList = res.data.results

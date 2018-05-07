@@ -34,8 +34,8 @@ export const postBoardContent = (content, type, target_id) => {
 }
 
 // 获取全站通知
-export const getBoardMessage = params => {
-  return axios.get(`${HOST}/board/`, {headers})
+export const getBoardMessage = page => {
+  return axios.get(`${HOST}/board/`, {params: {page}, headers})
 }
 
 // 登陆验证
