@@ -11,15 +11,6 @@
             <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column prop="date_joined" label="加入时间" width="175"></el-table-column>
             <el-table-column prop="last_login" label="上次登陆时间" width="175"></el-table-column>
-            <el-table-column fixed="right" label="操作" width="250">
-              <template slot-scope="scope">
-                <div class="ui small buttons">
-                  <button @click="handleClick(scope.row)" class="ui button grey">编辑</button>
-                  <div class="or"></div>
-                  <button class="ui button">删除</button>
-                </div>
-              </template>
-            </el-table-column>
           </el-table>
           <el-pagination
             id="pagination"

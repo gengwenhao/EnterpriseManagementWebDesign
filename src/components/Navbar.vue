@@ -7,7 +7,7 @@
           <template slot="title">机构管理</template>
           <el-menu-item index="2-1">树形图</el-menu-item>
           <el-menu-item index="2-2">查看全部机构</el-menu-item>
-          <el-menu-item index="2-3">管理人员</el-menu-item>
+          <el-menu-item index="2-3">查看全部人员</el-menu-item>
         </el-submenu>
         <el-menu-item v-if="isLogin" index="3"><a>个人信息管理</a></el-menu-item>
         <el-menu-item v-if="isLogin" index="4"><a>工具中心</a></el-menu-item>
@@ -99,7 +99,7 @@
         activeIndex: 1,
         userName: '',
         userPwd: '',
-        boardMessageCount: null
+        boardMessageCount: 0
       }
     },
     components: {},
@@ -140,8 +140,10 @@
           cookie.setCookie('token', res.data.token, 7)
           this.$store.commit('login')
           this.notify('认证信息通过', '欢迎登陆')
+          setTimeout(() => {
+            location.href = '/'
+          }, 2000)
         }, err => {
-          console.log(err)
           this.notify('无法使用提供的认证信息登录', '检查您的输入信息或网络状态')
         })
       },
@@ -154,27 +156,36 @@
         switch (key) {
           case '1':
             this.$router.push({name: 'index'})
+            this.activeIndex = 1
             break
           case '2-1':
             this.$router.push({name: 'tree'})
+            this.activeIndex = 2
             break
           case '2-2':
             this.$router.push({name: 'all-orgs'})
+            this.activeIndex = 2
             break
           case '2-3':
             this.$router.push({name: 'all-users'})
+            this.activeIndex = 2
             break
           case '3':
             this.$router.push({name: 'userprofile-manager'})
+            this.activeIndex = 3
             break
           case '4':
             this.$router.push({name: 'tools'})
+            this.activeIndex = 4
             break
         }
       },
       // 获取全站通知
       getBoardMessage() {
         api.getBoardMessage().then(res => {
+          // vuex
+          this.$store.state.msgBoard = res.data
+
           if (res.data.count > this.boardMessageCount) {
             this.boardMessageCount = res.data.count
 
@@ -195,7 +206,8 @@
               title: title,
               message: res.data.results[0].content,
               type: 'success',
-              dangerouslyUseHTMLString: true
+              dangerouslyUseHTMLString: true,
+              duration: 0
             })
           }
         })
@@ -204,7 +216,32 @@
     // 定时刷新
     beforeMount() {
       //设置定时器，每3秒刷新一次
-      setInterval(this.getBoardMessage, 1000)
+      setInterval(this.getBoardMessage, 3000)
+    },
+    created() {
+      api.getBoardMessage().then(res => {
+        this.boardMessageCount = res.data.count
+      })
+      switch (this.$route.path) {
+        case '/':
+          this.activeIndex = 1
+          break
+        case '/tree':
+          this.activeIndex = 2
+          break
+        case '/all-orgs':
+          this.activeIndex = 2
+          break
+        case '/all-users':
+          this.activeIndex = 2
+          break
+        case '/userprofile-mamager':
+          this.activeIndex = 3
+          break
+        case '/tools':
+          this.activeIndex = 4
+          break
+      }
     }
   }
 </script>

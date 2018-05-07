@@ -1,3 +1,4 @@
 export default {
-  isLogin: false
+  isLogin: false,
+  msgBoard: null
 }

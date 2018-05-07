@@ -49,6 +49,19 @@
             </div>
           </div>
         </div>
+        <div class="card">
+          <div class="content">
+            <div class="header">历史记录</div>
+            <div class="meta">这个面板存放了您的所有历史通知</div>
+            <div class="description">查看历史记录</div>
+          </div>
+          <div class="extra content">
+            <div class="ui button inverted fluid blue">
+              查看
+            </div>
+            <div class="floating ui teal label">{{ msgBoard.count }}</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -92,6 +105,11 @@
 
   export default {
     name: 'tools',
+    computed: {
+      msgBoard() {
+        return this.$store.state.msgBoard
+      }
+    },
     watch: {
       filterText(val) {
         this.$refs.tree2.filter(val);

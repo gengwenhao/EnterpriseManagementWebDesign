@@ -28,6 +28,8 @@
 <script>
   import ElRow from "element-ui/packages/row/src/row";
   import axios from 'axios'
+  import cookie from '../../static/js/cookie'
+  import * as api from '../api/api'
 
   export default {
     components: {ElRow},
@@ -80,15 +82,16 @@
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            axios({
-              method: 'post',
-              url: 'http://em.gengwenhao.com:8000/api/update-userpassword/',
-              data: {
-                password: this.ruleForm2.pass,
-              }
-            })
+            api.changePassword(this.ruleForm2.pass)
+              .then(res => {
+                this.$message('修改成功, 现在请用您的新密码登陆')
+                cookie.delCookie('token')
+                setTimeout(() => {
+                  location.href = '/'
+                }, 2000)
+              })
           }
-        });
+        })
       },
       resetForm(formName) {
         this.$refs[formName].resetFields();
@@ -97,7 +100,6 @@
     created() {
       // 验证登陆
       let token = cookie.getCookie('token')
-      alert(token)
       if (token) this.$store.commit('login')
     }
   }

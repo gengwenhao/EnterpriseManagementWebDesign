@@ -52,3 +52,8 @@ export const getOrgProfile = params => {
 export const getOrgInfo = params => {
   return axios.get(`${HOST}/api/orginfo/`)
 }
+
+// 密码更新
+export const changePassword = new_password => {
+  return axios.put(`${HOST}/change_password/1/`, {new_password}, {headers})
+}

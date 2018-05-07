@@ -300,4 +300,8 @@
     margin-bottom: 6px;
   }
 
+  #id-message-box {
+    margin-top: 23px;
+  }
+
 </style>
