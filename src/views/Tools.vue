@@ -32,7 +32,7 @@
             <div class="description">对指定机构下所有用户发起, 非机构用户无法得到通知</div>
           </div>
           <div class="extra content">
-            <div class="ui button fluid blue">
+            <div @click="showOrgBoard" class="ui button fluid blue">
               选择组织
             </div>
           </div>
@@ -44,12 +44,36 @@
             <div class="description">选择用户发起通知</div>
           </div>
           <div class="extra content">
-            <div class="ui button fluid yellow">
+            <div @click="showUserBoard" class="ui button fluid yellow">
               选择人员
             </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <el-input
+      v-if="isShowUserIdInput"
+      class="userid-input"
+      placeholder="输入用户ID"
+      v-model="userId">
+    </el-input>
+
+    <div v-if="isShowOrgTree" class="custom-tree-container">
+      <el-input
+        placeholder="输入关键字进行过滤"
+        v-model="filterText">
+      </el-input>
+
+      <el-tree
+        class="filter-tree"
+        show-checkbox
+        :data="orgList"
+        :props="defaultProps"
+        default-expand-all
+        :filter-node-method="filterNode"
+        ref="tree">
+      </el-tree>
     </div>
 
     <div v-show="isShowEditor" id="id-editor-panel">
@@ -64,48 +88,99 @@
   import cookie from '../../static/js/cookie'
   import ElCollapseTransition from "element-ui/src/transitions/collapse-transition"
   import E from 'wangeditor'
+  import * as api from '../api/api'
 
   export default {
     name: 'tools',
+    watch: {
+      filterText(val) {
+        this.$refs.tree2.filter(val);
+      }
+    },
     components: {ElCollapseTransition},
     data() {
       return {
+        userId: '',
         editorContent: '',
         isShowEditor: false,
+        isShowOrgTree: false,
+        isShowUserIdInput: false,
         submitContent: '',
-        editorObj: null
+        editorObj: null,
+        orgList: [],
+        filterText: '',
+        defaultProps: {
+          children: 'children',
+          label: 'name'
+        },
+        curBoardType: 0
       }
     },
     methods: {
-      // 关闭公告
+      // 过滤节点
+      filterNode(value, data) {
+        if (!value) return true
+        return data.name.indexOf(value) !== -1
+      },
+      // 关闭面板
       closeBoard() {
         this.editorContent = ''
         this.editorObj.txt.html('')
         this.isShowEditor = false
+        this.isShowOrgTree = false
+        this.isShowUserIdInput = false
       },
-      // 显示公告
+      // 显示公告发起面板
       showBoard() {
+        this.closeBoard()
         this.isShowEditor = true
         this.submitContent = '发送公告给全站用户'
+        this.curBoardType = 1
       },
-      // 发送公告
+      // 显示会议通知发起面板
+      showOrgBoard() {
+        this.closeBoard()
+        this.isShowOrgTree = true
+        this.isShowEditor = true
+        this.submitContent = '会议通知'
+        this.curBoardType = 2
+      },
+      // 显示用户通知发起面板
+      showUserBoard() {
+        this.closeBoard()
+        this.isShowEditor = true
+        this.isShowUserIdInput = true
+        this.submitContent = '发送消息到用户'
+        this.curBoardType = 3
+      },
+      // 发送
       sendBoard() {
         if (this.editorContent)
-          this.postBoardContent(0, null)
+          switch (this.curBoardType) {
+            case 1:
+              this.postBoardContent(0, null)
+              break
+            case 2:
+              let orgList = this.$refs.tree.getCheckedNodes()
+              orgList.forEach(item => {
+                this.postBoardContent(1, item.id)
+              })
+              break
+            case 3:
+              if (this.userId)
+                this.postBoardContent(2, this.userId)
+              else
+                this.$message('输入用户ID')
+              break
+            default:
+              break
+          }
         else
           this.$message('请输入内容')
       },
-      // 网络发送
+      // 将内容发送给后端
       postBoardContent(type, targetId) {
-        this.$http.post('http://em.gengwenhao.com:8000/board/', {
-          "content": this.editorContent,
-          "type": type,
-          "target_id": targetId
-        }, {
-          headers: {
-            'Authorization': 'JWT ' + cookie.getCookie('token'),
-          }
-        })
+        api.postBoardContent(this.editorContent, type, targetId)
           .then(res => {
             this.$message('发送成功')
             this.closeBoard()
@@ -117,6 +192,10 @@
     created() {
       let token = cookie.getCookie('token')
       if (token) this.$store.commit('login')
+
+      api.getOrgProfile().then(res => {
+        this.orgList = res.data.results
+      })
     },
     mounted() {
       let editor = new E(this.$refs.editor)
@@ -130,12 +209,11 @@
 </script>
 
 <style scoped>
-  #tools {
-    padding: 23px;
-  }
-
   #id-submit-editor {
     margin-top: 12px;
   }
 
+  #tools, .custom-tree-container, .userid-input {
+    padding: 23px;
+  }
 </style>

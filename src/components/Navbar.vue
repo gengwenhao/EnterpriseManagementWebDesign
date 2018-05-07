@@ -85,6 +85,7 @@
 
 <script>
   import cookie from '../../static/js/cookie'
+  import * as api from '../api/api'
 
   export default {
     name: 'navbar',
@@ -98,21 +99,11 @@
         activeIndex: 1,
         userName: '',
         userPwd: '',
-        boardMessageCount: 0
+        boardMessageCount: null
       }
     },
     components: {},
     methods: {
-      // init Messaage Board
-      initMsgBoard() {
-        this.$http.get('http://em.gengwenhao.com:8000/board/', {
-          headers: {
-            'Authorization': 'JWT ' + cookie.getCookie('token'),
-          }
-        }).then(res => {
-          this.boardMessageCount = res.data.count
-        })
-      },
       // notify
       notify(title, messageText) {
         const h = this.$createElement;
@@ -145,18 +136,10 @@
       },
       // 发送验证登陆的数据到服务器后端
       postLoginData() {
-        this.$http({
-          method: 'post',
-          url: 'http://em.gengwenhao.com:8000/login/',
-          data: {
-            username: this.userName,
-            password: this.userPwd
-          }
-        }).then(res => {
+        api.login(this.userName, this.userPwd).then(res => {
           cookie.setCookie('token', res.data.token, 7)
           this.$store.commit('login')
           this.notify('认证信息通过', '欢迎登陆')
-
         }, err => {
           console.log(err)
           this.notify('无法使用提供的认证信息登录', '检查您的输入信息或网络状态')
@@ -191,11 +174,7 @@
       },
       // 获取全站通知
       getBoardMessage() {
-        this.$http.get('http://em.gengwenhao.com:8000/board/', {
-          headers: {
-            'Authorization': 'JWT ' + cookie.getCookie('token'),
-          }
-        }).then(res => {
+        api.getBoardMessage().then(res => {
           if (res.data.count > this.boardMessageCount) {
             this.boardMessageCount = res.data.count
 
@@ -226,9 +205,6 @@
     beforeMount() {
       //设置定时器，每3秒刷新一次
       setInterval(this.getBoardMessage, 1000)
-    },
-    created() {
-      this.initMsgBoard()
     }
   }
 </script>

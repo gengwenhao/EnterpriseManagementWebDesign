@@ -114,12 +114,12 @@
 </template>
 
 <script>
-  import ElRow from "element-ui/packages/row/src/row";
-  import Modal from '../components/Modal'
+  import ElRow from "element-ui/packages/row/src/row"
   import cookie from '../../static/js/cookie'
+  import * as api from '../api/api'
 
   export default {
-    components: {ElRow, Modal},
+    components: {ElRow},
     name: 'index',
     data() {
       return {
@@ -152,24 +152,11 @@
           cancelButtonText: '取消',
         }).then(({value}) => {
           if (value) {
-            this.$http.post('http://em.gengwenhao.com:8000/message_profile/', {
-              "content": value
-            }, {
-              headers: {
-                'Authorization': 'JWT ' + cookie.getCookie('token'),
-              }
-            },).then(res => {
-              // show message box
-              this.$message({
-                type: 'success',
-                message: '添加留言成功: ' + value
-              })
-
-              // refresh
+            api.postUserMsg(value).then(res => {
+              this.$message(`添加留言成功: ${value}`)
               this.getMsg()
-
             }, err => {
-              this.$message('请输入留言内容')
+              this.$message('发送失败')
             })
           } else {
             this.$message('请输入留言内容')
@@ -184,12 +171,7 @@
       },
       // 分页
       pageChange(page) {
-        this.$http.get('http://em.gengwenhao.com:8000/message_profile/', {
-          params: {page: page},
-          headers: {
-            'Authorization': 'JWT ' + cookie.getCookie('token'),
-          }
-        })
+        api.getUserMsg(page)
           .then(res => {
             this.user_message = res.data
           }, err => {
@@ -214,21 +196,17 @@
       },
       // 获取用户留言
       getMsg() {
-        this.$http.get('http://em.gengwenhao.com:8000/message_profile/', {
-          headers: {
-            'Authorization': 'JWT ' + cookie.getCookie('token'),
-          }
-        })
+        api.getUserMsg(1)
           .then(res => {
             this.user_message = res.data
             this.msg_count = res.data.count
           }, err => {
-            console.log('获取用户留言失败', err)
+            this.$message('获取用户留言失败', err)
           })
       },
       // 获取用户信息
       getUserInfo() {
-        this.$http.get('http://em.gengwenhao.com:8000/api/userinfo/')
+        api.getUserInfo()
           .then(res => {
             this.setChart(res)
           })

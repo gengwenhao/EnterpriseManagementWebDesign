@@ -8,7 +8,7 @@
             <el-table-column prop="username" label="用户名" width="120"></el-table-column>
             <el-table-column prop="name" label="姓名" width="80"></el-table-column>
             <el-table-column prop="email" label="邮箱" width="240"></el-table-column>
-            <el-table-column prop="gender" label="性别" width="80"></el-table-column>
+            <el-table-column prop="id" label="ID" width="80"></el-table-column>
             <el-table-column prop="date_joined" label="加入时间" width="175"></el-table-column>
             <el-table-column prop="last_login" label="上次登陆时间" width="175"></el-table-column>
             <el-table-column fixed="right" label="操作" width="250">
@@ -34,7 +34,8 @@
 </template>
 
 <script>
-  import axios from 'axios'
+  import cookie from '../../static/js/cookie'
+  import * as api from '../api/api'
 
   export default {
     filters: {
@@ -57,7 +58,7 @@
         console.log(index, row);
       },
       pageChange(page) {
-        axios.get(`http://127.0.0.1:8000/user_profile/`, {params: {page: page}})
+        api.getUserProfile({page})
           .then(res => {
             this.pageData = {
               count: res.data.count,
@@ -79,10 +80,9 @@
       let token = cookie.getCookie('token')
       if (token) this.$store.commit('login')
 
-      axios.get('http://em.gengwenhao.com:8000/org_profile/')
-        .then(res => {
-          this.treeData = res.data.results
-        })
+      api.getUserProfile().then(res => {
+        this.treeData = res.data.results
+      })
 
       this.pageChange(1)
     }

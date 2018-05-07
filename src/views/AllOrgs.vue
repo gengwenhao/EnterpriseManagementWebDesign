@@ -64,8 +64,10 @@
 </template>
 
 <script>
+  import cookie from '../../static/js/cookie'
   import ElRow from "element-ui/packages/row/src/row";
   import axios from 'axios'
+  import * as api from '../api/api'
 
   export default {
     components: {ElRow},
@@ -88,10 +90,9 @@
       let token = cookie.getCookie('token')
       if (token) this.$store.commit('login')
 
-      axios.get('http://127.0.0.1:8000/api/orginfo/')
-        .then(res => {
-          this.tableData = res.data.orgs
-        })
+      api.getOrgInfo().then(res => {
+        this.tableData = res.data.orgs
+      })
     }
   }
 </script>

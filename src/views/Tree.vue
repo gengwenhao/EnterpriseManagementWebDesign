@@ -36,6 +36,9 @@
 </template>
 
 <script>
+  import cookie from '../../static/js/cookie'
+  import * as api from '../api/api'
+
   export default {
     name: 'tree',
     data() {
@@ -52,40 +55,37 @@
     },
     methods: {
       pageToAll() {
-        this.$http.get('http://em.gengwenhao.com:8000/org_profile/')
-          .then(res => {
-            this.treeData = res.data.results
-          })
+        api.getOrgProfile().then(res => {
+          this.treeData = res.data.results
+        })
 
         this.pageChange(1)
         this.curTitle = '全部'
       },
       handleNodeClick(data) {
-        this.$http.get('http://127.0.0.1:8000/user_profile/', {params: {user_orgs: data.id}})
-          .then(res => {
-            this.pageData = {
-              count: res.data.count,
-              results: res.data.results,
-              next: res.data.next,
-              previous: res.data.previous
-            }
+        api.getUserProfile({user_orgs: data.id}).then(res => {
+          this.pageData = {
+            count: res.data.count,
+            results: res.data.results,
+            next: res.data.next,
+            previous: res.data.previous
+          }
 
-            this.tableData = res.data.results
-          })
+          this.tableData = res.data.results
+        })
 
         this.curTitle = data.name
       },
       pageChange(page) {
-        this.$http.get(`http://127.0.0.1:8000/user_profile/`, {params: {page: page}})
-          .then(res => {
-            this.pageData = {
-              count: res.data.count,
-              results: res.data.results,
-              next: res.data.next,
-              previous: res.data.previous
-            }
-            this.tableData = res.data.results
-          })
+        api.getUserProfile({page}).then(res => {
+          this.pageData = {
+            count: res.data.count,
+            results: res.data.results,
+            next: res.data.next,
+            previous: res.data.previous
+          }
+          this.tableData = res.data.results
+        })
       }
     },
     created() {
@@ -93,10 +93,10 @@
       let token = cookie.getCookie('token')
       if (token) this.$store.commit('login')
 
-      this.$http.get('http://em.gengwenhao.com:8000/org_profile/')
-        .then(res => {
-          this.treeData = res.data.results
-        })
+      console.log('开始获取组织机构信息')
+      api.getOrgProfile().then(res => {
+        this.treeData = res.data.results
+      })
 
       this.pageChange(1)
     }
