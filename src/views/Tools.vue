@@ -35,7 +35,7 @@
           </div>
           <div class="extra content">
             <div @click="showBoard" class="ui button fluid red">
-              发起公告
+              发起公告&nbsp;<i class="lemon icon"></i>
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
           </div>
           <div class="extra content">
             <div @click="showOrgBoard" class="ui button fluid blue">
-              选择组织
+              选择组织&nbsp;<i class="comment icon"></i>
             </div>
           </div>
         </div>
@@ -59,11 +59,10 @@
           </div>
           <div class="extra content">
             <div @click="showUserBoard" class="ui button fluid yellow">
-              选择人员
+              选择人员&nbsp;<i class="mail icon"></i>
             </div>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -96,14 +95,15 @@
       <button @click="sendBoard" id="id-submit-editor" class="ui button grey" v-text="submitContent"></button>
     </div>
 
-
     <div id="msg" v-show="isShowMsg">
 
-      <div class="ui items" v-for="msg in msgList">
-        <div class="ui yellow message">
-          <i class="star icon"></i>
-          <span>{{ msg.add_time|strfTime }}</span>
-          <div v-html="msg.content"></div>
+      <div class="ui items" v-for="msg,index in msgList">
+        <div @click="msg.isShow=!msg.isShow" class="ui message" :class="{red:msg.type==0,blue:msg.type==1,yellow:msg.type==2}">
+          <span class="msg-title" v-if="msg.type==0">公告</span>
+          <span class="msg-title" v-if="msg.type==1">会议通知</span>
+          <span class="msg-title" v-if="msg.type==2">用户通知</span>
+          <span class="add-time">时间&nbsp;{{ msg.add_time|strfTime }}</span>
+          <div v-show="msg.isShow" class="msg-content" v-html="msg.content"></div>
         </div>
       </div>
 
@@ -164,6 +164,12 @@
       }
     },
     methods: {
+      // 显示记录
+      showFullBoard(index) {
+        alert(this.msgList[index].isShow)
+        this.msgList[index].isShow = true
+        alert(this.msgList[index].isShow)
+      },
       // 过滤节点
       filterNode(value, data) {
         if (!value) return true
@@ -248,6 +254,9 @@
       // 更新历史记录
       updateMsgBoard(page) {
         api.getBoardMessage(page).then(res => {
+          res.data.results.forEach(item => {
+            item.isShow = false
+          })
           this.msgCount = res.data.count
           this.msgList = res.data.results
         })
@@ -262,6 +271,9 @@
       if (token) this.$store.commit('login')
 
       api.getBoardMessage().then(res => {
+        res.data.results.forEach(item => {
+          item.isShow = false
+        })
         this.msgCount = res.data.count
         this.msgList = res.data.results
       })
@@ -288,5 +300,18 @@
 
   #tools, .custom-tree-container, .userid-input {
     padding: 23px;
+  }
+
+  .add-time {
+    font-size: 12px;
+    margin-left: 25px;
+  }
+
+  .msg-content {
+    margin: 14px;
+  }
+
+  .msg-title {
+    font-size: 20px;
   }
 </style>

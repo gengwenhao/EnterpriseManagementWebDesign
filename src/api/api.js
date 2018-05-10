@@ -2,7 +2,8 @@ import axios from 'axios'
 import cookie from '../../static/js/cookie'
 
 
-const HOST = 'http://localhost:8000';
+// const HOST = 'http://em.gengwenhao.com'
+const HOST = 'http://localhost:8000'
 
 let headers = {
   'Authorization': 'JWT ' + cookie.getCookie('token'),
